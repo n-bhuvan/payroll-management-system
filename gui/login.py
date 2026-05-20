@@ -2,7 +2,11 @@ import customtkinter as ctk
 from tkinter import messagebox
 import mysql.connector
 
+from database.db import connect_db
+
 from gui.dashboard import open_dashboard
+
+
 
 def login_page(app):
 
@@ -13,12 +17,7 @@ def login_page(app):
         print(username,password)
 
         try:
-            connection=mysql.connector.connect(
-                host="localhost",
-                user="root",
-                password="root",
-                database="payroll_system"
-            )
+            connection=connect_db()
             print("Connected Successfully")
             cursor=connection.cursor()
 
@@ -34,7 +33,7 @@ def login_page(app):
                 app.withdraw()
                 open_dashboard(app)
             else:
-                messagebox.showerror("Invalid username or password",message="Please Enter Correct Information")
+                messagebox.showwarning("Login Failed","Invalid Username or Password")
         except Exception as e:
             print(e)
             messagebox.showerror("Database Error",str(e))
@@ -52,4 +51,3 @@ def login_page(app):
     login_button=ctk.CTkButton(app,command=login,text="Login")
 
     login_button.pack(pady=20)
-
