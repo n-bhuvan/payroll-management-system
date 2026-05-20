@@ -165,7 +165,7 @@ def open_add_employee(app,referesh_callback):
     employee_window.mainloop()
     
 
-def open_view_employees(app):
+def open_view_employees(app,refresh_callback):
 
     view_window = ctk.CTkToplevel(app)
 
@@ -205,6 +205,17 @@ def open_view_employees(app):
     )
 
     update_button.pack(pady=10)
+
+    delete_button = ctk.CTkButton(
+    view_window,
+    text="Delete Employee",
+    width=200,
+    fg_color="red",
+    hover_color="darkred",
+    command=lambda: open_delete_employee(app, refresh_callback)
+    )
+
+    delete_button.pack(pady=10)
 
     headers = [
         "ID",
@@ -409,6 +420,89 @@ def open_update_employee(app):
         command=update_employee
     )
 
-    update_btn.pack(pady=20)
+def open_delete_employee(app):
 
-        
+    delete_window = ctk.CTkToplevel(app)
+
+    delete_window.geometry("400x300")
+
+    delete_window.title("Delete Employee")
+
+    delete_window.attributes("-topmost",True)
+    delete_window.focus_force()
+    delete_window.after(
+        100,
+        lambda: delete_window.attributes("-topmost",False)
+    )
+
+    title = ctk.CTkLabel(
+        delete_window,
+        text="Delete Employee",
+        font=("Arial", 28, "bold")
+    )
+
+    title.pack(pady=20)
+
+    id_entry = ctk.CTkEntry(
+        delete_window,
+        placeholder_text="Employee ID",
+        width=250
+    )
+
+    id_entry.pack(pady=20)
+
+    def delete_employee():
+
+        employee_id = id_entry.get()
+
+        confirm = messagebox.askyesno(
+            "Confirm Delete",
+            "Are you sure you want to delete this employee?"
+        )
+
+        if not confirm:
+            return
+
+        try:
+
+            connection = connect_db()
+
+            cursor = connection.cursor()
+
+            query = """
+            DELETE FROM employees
+            WHERE employee_id=%s
+            """
+
+            cursor.execute(query, (employee_id,))
+
+            connection.commit()
+            refresh_callback()
+
+            messagebox.showinfo(
+                "Success",
+                "Employee Deleted Successfully!"
+            )
+
+            delete_window.destroy()
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Database Error",
+                str(e)
+            )
+
+    delete_btn = ctk.CTkButton(
+        delete_window,
+        text="Delete Employee",
+        width=200,
+        fg_color="red",
+        hover_color="darkred",
+        command=delete_employee
+    )
+
+    delete_btn.pack(pady=20)
+    
+
+
