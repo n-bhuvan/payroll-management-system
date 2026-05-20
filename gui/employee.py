@@ -197,6 +197,15 @@ def open_view_employees(app):
         pady=20
     )
 
+    update_button = ctk.CTkButton(
+    view_window,
+    text="Update Employee",
+    width=200,
+    command=lambda: open_update_employee(app)
+    )
+
+    update_button.pack(pady=10)
+
     headers = [
         "ID",
         "Name",
@@ -268,5 +277,138 @@ def open_view_employees(app):
             "Database Error",
             str(e)
     )
+        
+def open_update_employee(app):
+
+    update_window = ctk.CTkToplevel(app)
+
+    update_window.geometry("500x700")
+
+    update_window.title("Update Employee")
+
+    update_window.attributes("-topmost", True)
+    update_window.focus_force()
+    update_window.after(
+    100,
+    lambda: update_window.attributes("-topmost", False)
+    )
+
+    title = ctk.CTkLabel(
+        update_window,
+        text="Update Employee",
+        font=("Arial", 28, "bold")
+    )
+
+    title.pack(pady=20)
+
+    id_entry = ctk.CTkEntry(
+        update_window,
+        placeholder_text="Employee ID",
+        width=300
+    )
+
+    id_entry.pack(pady=10)
+
+    name_entry = ctk.CTkEntry(
+        update_window,
+        placeholder_text="New Name",
+        width=300
+    )
+
+    name_entry.pack(pady=10)
+
+    department_entry = ctk.CTkEntry(
+        update_window,
+        placeholder_text="New Department",
+        width=300
+    )
+
+    department_entry.pack(pady=10)
+
+    position_entry = ctk.CTkEntry(
+        update_window,
+        placeholder_text="New Position",
+        width=300
+    )
+
+    position_entry.pack(pady=10)
+
+    salary_entry = ctk.CTkEntry(
+        update_window,
+        placeholder_text="New Salary",
+        width=300
+    )
+
+    salary_entry.pack(pady=10)
+
+    bonus_entry = ctk.CTkEntry(
+        update_window,
+        placeholder_text="New Bonus",
+        width=300
+    )
+
+    bonus_entry.pack(pady=10)
+
+    deduction_entry = ctk.CTkEntry(
+        update_window,
+        placeholder_text="New Deductions",
+        width=300
+    )
+
+    deduction_entry.pack(pady=10)
+
+    def update_employee():
+
+        try:
+
+            connection = connect_db()
+
+            cursor = connection.cursor()
+
+            query = """
+            UPDATE employees
+            SET name=%s,
+                department=%s,
+                position=%s,
+                salary=%s,
+                bonus=%s,
+                deductions=%s
+            WHERE employee_id=%s
+            """
+
+            values = (
+                name_entry.get(),
+                department_entry.get(),
+                position_entry.get(),
+                salary_entry.get(),
+                bonus_entry.get(),
+                deduction_entry.get(),
+                id_entry.get()
+            )
+
+            cursor.execute(query, values)
+
+            connection.commit()
+
+            messagebox.showinfo(
+                "Success",
+                "Employee Updated Successfully!"
+            )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Database Error",
+                str(e)
+            )
+
+    update_btn = ctk.CTkButton(
+        update_window,
+        text="Update Employee",
+        width=200,
+        command=update_employee
+    )
+
+    update_btn.pack(pady=20)
 
         
