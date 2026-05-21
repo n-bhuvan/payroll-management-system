@@ -4,7 +4,7 @@ from gui.employee import (open_add_employee,open_view_employees)
 
 from database.db import connect_db
 
-from analytics.analytics import (get_total_payroll,get_average_salary,get_highest_salary)
+from analytics.analytics import (get_total_payroll,get_average_salary,get_highest_salary,show_department_chart)
 
 def get_total_employees():
     connection=connect_db()
@@ -142,5 +142,14 @@ def open_dashboard(app):
     )
 
     view_employee_button.place(x=400, y=250)
+
+    chart_button = ctk.CTkButton(
+    main_frame,
+    text="Show Analytics Chart",
+    width=220,
+    command=show_department_chart
+    )
+
+    chart_button.place(x=700, y=250)
 
     dashboard.mainloop()
