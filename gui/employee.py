@@ -1,8 +1,12 @@
+from multiprocessing.dummy import connection
+
 import customtkinter as ctk
 
 from tkinter import messagebox
 
 from database.db import connect_db
+
+from models.payroll import calculate_net_salary
 
 
 def save_employee(
@@ -38,6 +42,8 @@ def save_employee(
         cursor.execute(query, values)
 
         connection.commit()
+        cursor.close()
+        connection.close()
 
         messagebox.showinfo(
             "Success",
@@ -52,7 +58,7 @@ def save_employee(
         )
         
 
-def open_add_employee(app,referesh_callback):
+def open_add_employee(app,refresh_callback):
 
     employee_window = ctk.CTkToplevel(app)
     
@@ -151,7 +157,8 @@ def open_add_employee(app,referesh_callback):
 
         deduction_entry.delete(0, "end")
 
-        referesh_callback()
+        if refresh_callback:
+            refresh_callback()
 
     save_button = ctk.CTkButton(
         employee_window,
@@ -165,7 +172,7 @@ def open_add_employee(app,referesh_callback):
     employee_window.mainloop()
     
 
-def open_view_employees(app,refresh_callback):
+def open_view_employees(app,refresh_callback=None):
 
     view_window = ctk.CTkToplevel(app)
 
@@ -189,19 +196,12 @@ def open_view_employees(app,refresh_callback):
     title.pack(pady=20)
 
     table_frame = ctk.CTkFrame(view_window)
-
-    table_frame.pack(
-        fill="both",
-        expand=True,
-        padx=20,
-        pady=20
-    )
-
+    table_frame.pack(pady=10)
     update_button = ctk.CTkButton(
     view_window,
     text="Update Employee",
     width=200,
-    command=lambda: open_update_employee(app)
+    command=lambda: open_update_employee(app,refresh_callback)
     )
 
     update_button.pack(pady=10)
@@ -218,11 +218,14 @@ def open_view_employees(app,refresh_callback):
     delete_button.pack(pady=10)
 
     headers = [
-        "ID",
-        "Name",
-        "Department",
-        "Position",
-        "Salary"
+    "ID",
+    "Name",
+    "Department",
+    "Position",
+    "Salary",
+    "Bonus",
+    "Deductions",
+    "Net Salary"
     ]
 
     for col, header in enumerate(headers):
@@ -248,12 +251,14 @@ def open_view_employees(app,refresh_callback):
         cursor = connection.cursor()
 
         query = """
-        SELECT employee_id,
-               name,
-               department,
-               position,
-               salary
-        FROM employees
+            SELECT employee_id,
+            name,
+            department,
+            position,
+            salary,
+            bonus,
+            deductions
+            FROM employees
         """
 
         cursor.execute(query)
@@ -265,6 +270,22 @@ def open_view_employees(app,refresh_callback):
             start=1
         ):
 
+            salary = employee[4]
+
+            bonus = employee[5]
+
+            deductions = employee[6]
+
+            net_salary = calculate_net_salary(
+                salary,
+                bonus,
+                deductions
+            )
+
+            employee = list(employee)
+
+            employee.append(net_salary)
+            
             for col_num, value in enumerate(employee):
 
                 data_label = ctk.CTkLabel(
@@ -289,7 +310,7 @@ def open_view_employees(app,refresh_callback):
             str(e)
     )
         
-def open_update_employee(app):
+def open_update_employee(app,refresh_callback=None):
 
     update_window = ctk.CTkToplevel(app)
 
@@ -400,6 +421,8 @@ def open_update_employee(app):
             cursor.execute(query, values)
 
             connection.commit()
+            cursor.close()
+            connection.close()
 
             messagebox.showinfo(
                 "Success",
@@ -419,8 +442,9 @@ def open_update_employee(app):
         width=200,
         command=update_employee
     )
+    update_btn.pack(pady=20)
 
-def open_delete_employee(app):
+def open_delete_employee(app,refresh_callback=None):
 
     delete_window = ctk.CTkToplevel(app)
 
@@ -477,7 +501,11 @@ def open_delete_employee(app):
             cursor.execute(query, (employee_id,))
 
             connection.commit()
-            refresh_callback()
+            cursor.close()
+            connection.close()
+            
+            if refresh_callback:
+                refresh_callback()
 
             messagebox.showinfo(
                 "Success",
