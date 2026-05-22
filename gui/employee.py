@@ -8,6 +8,7 @@ from database.db import connect_db
 
 from models.payroll import calculate_net_salary
 
+from models.payslip import generate_payslip
 
 def save_employee(
     name,
@@ -240,6 +241,15 @@ def open_view_employees(app,refresh_callback=None):
     )
 
     delete_button.pack(pady=10)
+
+    payslip_button = ctk.CTkButton(
+        view_window,
+        text="Generate Payslip",
+        width=220,
+        command=lambda: open_payslip_window(app)
+    )
+
+    payslip_button.pack(pady=10)
 
     headers = [
     "ID",
@@ -559,6 +569,101 @@ def open_delete_employee(app,refresh_callback=None):
     )
 
     delete_btn.pack(pady=20)
+
+def open_payslip_window(app):
+
+    payslip_window = ctk.CTkToplevel(app)
+    
+
+    payslip_window.geometry("400x300")
+    
+
+    payslip_window.title("Generate Payslip")
+
+    payslip_window.attributes("-topmost",True)
+    payslip_window.focus_force()
+    payslip_window.after(
+        100,lambda:payslip_window.attributes("-topmost",False)
+    )
+
+    
+
+    title = ctk.CTkLabel(
+        payslip_window,
+        text="Generate Payslip",
+        font=("Arial", 28, "bold")
+    )
+
+    title.pack(pady=20)
+
+    id_entry = ctk.CTkEntry(
+        payslip_window,
+        placeholder_text="Employee ID",
+        width=250
+    )
+
+    id_entry.pack(pady=20)
+
+    def generate_pdf():
+
+        employee_id = id_entry.get()
+
+        try:
+
+            connection = connect_db()
+
+            cursor = connection.cursor()
+
+            query = """
+            SELECT employee_id,
+                   name,
+                   department,
+                   position,
+                   salary,
+                   bonus,
+                   deductions
+            FROM employees
+            WHERE employee_id=%s
+            """
+
+            cursor.execute(query, (employee_id,))
+
+            employee = cursor.fetchone()
+
+            cursor.close()
+            connection.close()
+
+            if employee:
+
+                file_name = generate_payslip(employee)
+
+                messagebox.showinfo(
+                    "Success",
+                    f"Payslip Generated!\n{file_name}"
+                )
+
+            else:
+
+                messagebox.showwarning(
+                    "Not Found",
+                    "Employee ID not found"
+                )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Database Error",
+                str(e)
+            )
+
+    generate_button = ctk.CTkButton(
+        payslip_window,
+        text="Generate PDF",
+        width=200,
+        command=generate_pdf
+    )
+
+    generate_button.pack(pady=20)
 
 def search_employee(table_frame, search_value):
 
