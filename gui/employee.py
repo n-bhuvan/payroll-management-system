@@ -1,4 +1,4 @@
-from multiprocessing.dummy import connection
+
 
 import customtkinter as ctk
 
@@ -197,6 +197,29 @@ def open_view_employees(app,refresh_callback=None):
 
     table_frame = ctk.CTkFrame(view_window)
     table_frame.pack(pady=10)
+
+    
+
+    search_entry = ctk.CTkEntry(
+        view_window,
+        placeholder_text="Search Employee Name",
+        width=250
+    )
+
+    search_entry.pack(pady=10)
+
+    search_button = ctk.CTkButton(
+        view_window,
+        text="Search",
+        width=150,
+        command=lambda: search_employee(
+            table_frame,
+            search_entry.get()
+        )
+    )
+
+    search_button.pack(pady=10)
+
     update_button = ctk.CTkButton(
     view_window,
     text="Update Employee",
@@ -205,6 +228,7 @@ def open_view_employees(app,refresh_callback=None):
     )
 
     update_button.pack(pady=10)
+    
 
     delete_button = ctk.CTkButton(
     view_window,
@@ -264,6 +288,8 @@ def open_view_employees(app,refresh_callback=None):
         cursor.execute(query)
 
         employees = cursor.fetchall()
+        cursor.close()
+        connection.close()
 
         for row_num, employee in enumerate(
             employees,
@@ -421,6 +447,8 @@ def open_update_employee(app,refresh_callback=None):
             cursor.execute(query, values)
 
             connection.commit()
+            if refresh_callback:
+                refresh_callback()
             cursor.close()
             connection.close()
 
@@ -531,6 +559,110 @@ def open_delete_employee(app,refresh_callback=None):
     )
 
     delete_btn.pack(pady=20)
+
+def search_employee(table_frame, search_value):
+
+    for widget in table_frame.winfo_children():
+
+        widget.destroy()
+
+    headers = [
+        "ID",
+        "Name",
+        "Department",
+        "Position",
+        "Salary",
+        "Bonus",
+        "Deductions",
+        "Net Salary"
+    ]
+
+    for col, header in enumerate(headers):
+
+        header_label = ctk.CTkLabel(
+            table_frame,
+            text=header,
+            font=("Arial", 18, "bold"),
+            width=150
+        )
+
+        header_label.grid(
+            row=0,
+            column=col,
+            padx=10,
+            pady=10
+        )
+
+    try:
+
+        connection = connect_db()
+
+        cursor = connection.cursor()
+
+        query = """
+        SELECT employee_id,
+               name,
+               department,
+               position,
+               salary,
+               bonus,
+               deductions
+        FROM employees
+        WHERE name LIKE %s
+        """
+
+        cursor.execute(
+            query,
+            (f"%{search_value}%",)
+        )
+
+        employees = cursor.fetchall()
+        cursor.close()
+        connection.close()
+
+        for row_num, employee in enumerate(
+            employees,
+            start=1
+        ):
+
+            salary = employee[4]
+
+            bonus = employee[5]
+
+            deductions = employee[6]
+
+            net_salary = calculate_net_salary(
+                salary,
+                bonus,
+                deductions
+            )
+
+            employee = list(employee)
+
+            employee.append(net_salary)
+
+            for col_num, value in enumerate(employee):
+
+                data_label = ctk.CTkLabel(
+                    table_frame,
+                    text=str(value),
+                    font=("Arial", 16),
+                    width=150
+                )
+
+                data_label.grid(
+                    row=row_num,
+                    column=col_num,
+                    padx=10,
+                    pady=5
+                )
+
+    except Exception as e:
+
+        messagebox.showerror(
+            "Database Error",
+            str(e)
+        )
     
 
 
