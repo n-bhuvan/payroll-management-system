@@ -140,6 +140,61 @@ def open_add_employee(app,refresh_callback):
         bonus = bonus_entry.get()
         deductions = deduction_entry.get()
 
+        if (
+            not name
+            or not department
+            or not position
+            or not salary
+            or not bonus
+            or not deductions
+        ):
+
+            messagebox.showwarning(
+                "Missing Data",
+                "Please fill all fields"
+            )
+
+            return
+        
+        try:
+
+            salary = float(salary)
+
+            bonus = float(bonus)
+
+            deductions = float(deductions)
+
+        except:
+
+            messagebox.showerror(
+                "Invalid Input",
+                "Salary, Bonus and Deductions must be numbers"
+            )
+
+            return
+        
+        if (
+            salary < 0
+            or bonus < 0
+            or deductions < 0
+        ):
+
+            messagebox.showwarning(
+                "Invalid Amount",
+                "Values cannot be negative"
+            )
+
+            return
+        
+        if deductions > (salary + bonus):
+
+            messagebox.showwarning(
+                "Invalid Payroll",
+                "Deductions cannot exceed total earnings"
+            )
+
+            return
+
         save_employee(
             name,
             department,
