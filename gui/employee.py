@@ -10,6 +10,8 @@ from models.payroll import calculate_net_salary
 
 from models.payslip import generate_payslip
 
+from models.export import export_employee_csv
+
 def save_employee(
     name,
     department,
@@ -250,6 +252,15 @@ def open_view_employees(app,refresh_callback=None):
     )
 
     payslip_button.pack(pady=10)
+
+    export_button = ctk.CTkButton(
+        view_window,
+        text="Export CSV Report",
+        width=220,
+        command=export_csv
+    )
+
+    export_button.pack(pady=10)
 
     headers = [
     "ID",
@@ -766,6 +777,24 @@ def search_employee(table_frame, search_value):
 
         messagebox.showerror(
             "Database Error",
+            str(e)
+        )
+
+def export_csv():
+
+    try:
+
+        file_path = export_employee_csv()
+
+        messagebox.showinfo(
+            "Export Successful",
+            f"CSV Report Saved!\n{file_path}"
+        )
+
+    except Exception as e:
+
+        messagebox.showerror(
+            "Export Error",
             str(e)
         )
     
