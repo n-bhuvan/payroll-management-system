@@ -315,14 +315,17 @@ def load_employee_table(table_frame):
             table_frame,
             text=header,
             font=("Arial", 18, "bold"),
-            width=150
+            width=140,
+            fg_color="#1f538d",
+            corner_radius=8,
+            text_color="white"
         )
 
         header_label.grid(
             row=0,
             column=col,
-            padx=10,
-            pady=10
+            padx=8,
+            pady=8
         )
 
     try:
@@ -375,15 +378,16 @@ def load_employee_table(table_frame):
                 data_label = ctk.CTkLabel(
                     table_frame,
                     text=str(value),
-                    font=("Arial", 16),
-                    width=150
+                    font=("Arial", 15),
+                    width=140,
+                    corner_radius=6
                 )
 
                 data_label.grid(
                     row=row_num,
                     column=col_num,
-                    padx=10,
-                    pady=5
+                    padx=8,
+                    pady=8
                 )
 
     except Exception as e:
@@ -418,7 +422,11 @@ def open_view_employees(app,refresh_dashboard):
 
     title.pack(pady=20)
 
-    table_frame = ctk.CTkFrame(view_window)
+    table_frame = ctk.CTkScrollableFrame(
+        view_window,
+        width=1100,
+        height=400
+    )
     table_frame.pack(pady=10)
     load_employee_table(table_frame)
 
@@ -1015,7 +1023,7 @@ def search_employee(table_frame, search_value):
         header_label.grid(
             row=0,
             column=col,
-            padx=10,
+            padx=8,
             pady=10
         )
 
@@ -1079,8 +1087,8 @@ def search_employee(table_frame, search_value):
                 data_label.grid(
                     row=row_num,
                     column=col_num,
-                    padx=10,
-                    pady=5
+                    padx=8,
+                    pady=8
                 )
 
     except Exception as e:
