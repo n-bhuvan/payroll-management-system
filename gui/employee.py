@@ -292,7 +292,7 @@ def open_add_employee(app,refresh_callback):
     employee_window.mainloop()
 
 
-def load_employee_table(table_frame):
+def load_employee_table(table_frame,employees=None):
 
     for widget in table_frame.winfo_children():
 
@@ -308,6 +308,14 @@ def load_employee_table(table_frame):
         "Deductions",
         "Net Salary"
     ]
+
+    for col in range(len(headers)):
+
+        table_frame.grid_columnconfigure(
+            col,
+            weight=1,
+            uniform="column"
+    )
 
     for col, header in enumerate(headers):
 
@@ -330,27 +338,24 @@ def load_employee_table(table_frame):
 
     try:
 
-        connection = connect_db()
+        if employees is None:
 
-        cursor = connection.cursor()
+            connection = connect_db()
 
-        query = """
-        SELECT employee_id,
-               name,
-               department,
-               position,
-               salary,
-               bonus,
-               deductions
-        FROM employees
-        """
+            cursor = connection.cursor()
 
-        cursor.execute(query)
+            query = """
+                SELECT *
+                FROM employees
+            """
 
-        employees = cursor.fetchall()
+            cursor.execute(query)
 
-        cursor.close()
-        connection.close()
+            employees = cursor.fetchall()
+
+            cursor.close()
+
+            connection.close()
 
         for row_num, employee in enumerate(
             employees,
@@ -1051,6 +1056,10 @@ def search_employee(table_frame, search_value):
         )
 
         employees = cursor.fetchall()
+        load_employee_table(
+            table_frame,
+            employees
+        )
         cursor.close()
         connection.close()
 
