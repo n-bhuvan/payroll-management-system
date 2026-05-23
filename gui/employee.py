@@ -1099,25 +1099,6 @@ def search_employee(table_frame, search_value):
         )
         
 
-def export_csv():
 
-    try:
-
-        file_path = export_employee_csv()
-
-        messagebox.showinfo(
-            "Export Successful",
-            f"CSV Report Saved!\n{file_path}"
-        )
-
-        clear_entries([id_entry])
-
-    except Exception as e:
-
-        messagebox.showerror(
-            "Export Error",
-            str(e)
-        )
-    
 
 
