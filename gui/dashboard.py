@@ -14,14 +14,33 @@ def get_total_employees():
     total=cursor.fetchone()[0]
     return total
 
-def refresh_employee_count():
+def refresh_dashboard():
 
-    total = get_total_employees()
+    total_employees = get_total_employees()
 
+    total_payroll = get_total_payroll()
+
+    average_salary = get_average_salary()
+
+    highest_salary = get_highest_salary()
 
     employee_label.configure(
-        text=f"Total Employees\n{total}"
-)
+        text=f"Total Employees\n{total_employees}"
+    )
+
+    payroll_label.configure(
+        text=f"Total Payroll\n₹{total_payroll}"
+    )
+
+    average_label.configure(
+        text=f"Average Salary\n₹{average_salary}"
+    )
+
+    highest_label.configure(
+        text=f"Highest Salary\n₹{highest_salary}"
+    )
+    
+
 def open_dashboard(app):
     dashboard=ctk.CTkToplevel(app)
 
@@ -61,6 +80,8 @@ def open_dashboard(app):
 
     payroll_card.place(x=320, y=50)
 
+    global payroll_label
+
     payroll_label = ctk.CTkLabel(
         payroll_card,
         text=f"Total Payroll\n₹{total_payroll}",
@@ -81,6 +102,8 @@ def open_dashboard(app):
 
     average_card.place(x=590, y=50)
 
+    global average_label
+
     average_label = ctk.CTkLabel(
         average_card,
         text=f"Average Salary\n₹{average_salary}",
@@ -100,6 +123,8 @@ def open_dashboard(app):
     )
 
     highest_card.place(x=860, y=50)
+
+    global highest_label
 
     highest_label = ctk.CTkLabel(
         highest_card,
@@ -122,12 +147,12 @@ def open_dashboard(app):
     )
 
     employee_label.place(relx=0.5, rely=0.5, anchor="center")
-    refresh_employee_count()
+    refresh_dashboard()
     add_employee_button = ctk.CTkButton(
         main_frame,
         text="Add Employee",
         width=200,
-        command=lambda: open_add_employee(app,refresh_employee_count)
+        command=lambda: open_add_employee(app,refresh_dashboard)
     )
 
     
@@ -138,7 +163,7 @@ def open_dashboard(app):
     main_frame,
     text="View Employees",
     width=200,
-    command=lambda: open_view_employees(app)
+    command=lambda: open_view_employees(app,refresh_dashboard)
     )
 
     view_employee_button.place(x=400, y=250)
@@ -151,5 +176,7 @@ def open_dashboard(app):
     )
 
     chart_button.place(x=700, y=250)
+
+    refresh_dashboard()
 
     dashboard.mainloop()

@@ -33,6 +33,38 @@ def save_employee(
         VALUES (%s, %s, %s, %s, %s, %s)
         """
 
+        check_query = """
+            SELECT * FROM employees
+            WHERE name=%s
+            AND department=%s
+            AND position=%s
+        """
+
+        check_values = (
+                name,
+                department,
+                position
+        )
+
+        cursor.execute(
+                check_query,
+                check_values
+        )
+
+        existing_employee = cursor.fetchone()
+
+        if existing_employee:
+
+            messagebox.showwarning(
+                "Duplicate Employee",
+                "Employee already exists!"
+            )
+
+            cursor.close()
+            connection.close()
+
+            return
+
         values = (
             name,
             department,
@@ -228,9 +260,112 @@ def open_add_employee(app,refresh_callback):
     save_button.pack(pady=20)
 
     employee_window.mainloop()
+
+
+def load_employee_table(table_frame):
+
+    for widget in table_frame.winfo_children():
+
+        widget.destroy()
+
+    headers = [
+        "ID",
+        "Name",
+        "Department",
+        "Position",
+        "Salary",
+        "Bonus",
+        "Deductions",
+        "Net Salary"
+    ]
+
+    for col, header in enumerate(headers):
+
+        header_label = ctk.CTkLabel(
+            table_frame,
+            text=header,
+            font=("Arial", 18, "bold"),
+            width=150
+        )
+
+        header_label.grid(
+            row=0,
+            column=col,
+            padx=10,
+            pady=10
+        )
+
+    try:
+
+        connection = connect_db()
+
+        cursor = connection.cursor()
+
+        query = """
+        SELECT employee_id,
+               name,
+               department,
+               position,
+               salary,
+               bonus,
+               deductions
+        FROM employees
+        """
+
+        cursor.execute(query)
+
+        employees = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        for row_num, employee in enumerate(
+            employees,
+            start=1
+        ):
+
+            salary = employee[4]
+
+            bonus = employee[5]
+
+            deductions = employee[6]
+
+            net_salary = calculate_net_salary(
+                salary,
+                bonus,
+                deductions
+            )
+
+            employee = list(employee)
+
+            employee.append(net_salary)
+
+            for col_num, value in enumerate(employee):
+
+                data_label = ctk.CTkLabel(
+                    table_frame,
+                    text=str(value),
+                    font=("Arial", 16),
+                    width=150
+                )
+
+                data_label.grid(
+                    row=row_num,
+                    column=col_num,
+                    padx=10,
+                    pady=5
+                )
+
+    except Exception as e:
+
+        messagebox.showerror(
+            "Database Error",
+            str(e)
+        )
     
 
-def open_view_employees(app,refresh_callback=None):
+def open_view_employees(app,refresh_dashboard):
+
 
     view_window = ctk.CTkToplevel(app)
 
@@ -255,6 +390,7 @@ def open_view_employees(app,refresh_callback=None):
 
     table_frame = ctk.CTkFrame(view_window)
     table_frame.pack(pady=10)
+    load_employee_table(table_frame)
 
     
 
@@ -282,7 +418,7 @@ def open_view_employees(app,refresh_callback=None):
     view_window,
     text="Update Employee",
     width=200,
-    command=lambda: open_update_employee(app,refresh_callback)
+    command=lambda: open_update_employee(app,refresh_dashboard,lambda:load_employee_table(table_frame))
     )
 
     update_button.pack(pady=10)
@@ -294,7 +430,7 @@ def open_view_employees(app,refresh_callback=None):
     width=200,
     fg_color="red",
     hover_color="darkred",
-    command=lambda: open_delete_employee(app, refresh_callback)
+    command=lambda: open_delete_employee(app,refresh_dashboard,lambda:load_employee_table(table_frame))
     )
 
     delete_button.pack(pady=10)
@@ -317,102 +453,8 @@ def open_view_employees(app,refresh_callback=None):
 
     export_button.pack(pady=10)
 
-    headers = [
-    "ID",
-    "Name",
-    "Department",
-    "Position",
-    "Salary",
-    "Bonus",
-    "Deductions",
-    "Net Salary"
-    ]
-
-    for col, header in enumerate(headers):
-
-        header_label = ctk.CTkLabel(
-            table_frame,
-            text=header,
-            font=("Arial", 18, "bold"),
-            width=150
-        )
-
-        header_label.grid(
-            row=0,
-            column=col,
-            padx=10,
-            pady=10
-        )
-
-    try:
-
-        connection = connect_db()
-
-        cursor = connection.cursor()
-
-        query = """
-            SELECT employee_id,
-            name,
-            department,
-            position,
-            salary,
-            bonus,
-            deductions
-            FROM employees
-        """
-
-        cursor.execute(query)
-
-        employees = cursor.fetchall()
-        cursor.close()
-        connection.close()
-
-        for row_num, employee in enumerate(
-            employees,
-            start=1
-        ):
-
-            salary = employee[4]
-
-            bonus = employee[5]
-
-            deductions = employee[6]
-
-            net_salary = calculate_net_salary(
-                salary,
-                bonus,
-                deductions
-            )
-
-            employee = list(employee)
-
-            employee.append(net_salary)
-            
-            for col_num, value in enumerate(employee):
-
-                data_label = ctk.CTkLabel(
-                    table_frame,
-                    text=str(value),
-                    font=("Arial", 16),
-                    width=150
-                )
-
-                data_label.grid(
-                    row=row_num,
-                    column=col_num,
-                    padx=10,
-                    pady=5
-                )
         
-
-    except Exception as e:
-
-        messagebox.showerror(
-            "Database Error",
-            str(e)
-    )
-        
-def open_update_employee(app,refresh_callback=None):
+def open_update_employee(app,refresh_callback=None,table_refresh_callback=None):
 
     update_window = ctk.CTkToplevel(app)
 
@@ -491,7 +533,70 @@ def open_update_employee(app,refresh_callback=None):
 
     deduction_entry.pack(pady=10)
 
+    
+
     def update_employee():
+
+        employee_id = id_entry.get()
+
+        name = name_entry.get()
+
+        department = department_entry.get()
+
+        position = position_entry.get()
+
+        salary = salary_entry.get()
+
+        bonus = bonus_entry.get()
+
+        deductions = deduction_entry.get()
+
+        if (
+            not employee_id
+            or not name
+            or not department
+            or not position
+            or not salary
+            or not bonus
+            or not deductions
+        ):
+
+            messagebox.showwarning(
+                "Missing Data",
+                "Please fill all fields"
+            )
+
+            return
+        
+        try:
+
+            salary = float(salary)
+
+            bonus = float(bonus)
+
+            deductions = float(deductions)
+
+        except:
+
+            messagebox.showerror(
+                "Invalid Input",
+                "Salary values must be numeric"
+            )
+
+            return
+        
+        if (
+            salary < 0
+            or bonus < 0
+            or deductions < 0
+        ):
+
+            messagebox.showwarning(
+                "Invalid Amount",
+                "Values cannot be negative"
+            )
+
+            return
 
         try:
 
@@ -510,21 +615,50 @@ def open_update_employee(app,refresh_callback=None):
             WHERE employee_id=%s
             """
 
+            check_query = """
+            SELECT * FROM employees
+            WHERE employee_id=%s
+            """
+
+            cursor.execute(
+                check_query,
+                (employee_id,)
+            )
+
+            employee_exists = cursor.fetchone()
+
+            if not employee_exists:
+
+                messagebox.showwarning(
+                    "Invalid Employee",
+                    "Employee ID does not exist"
+                )
+
+                cursor.close()
+                connection.close()
+
+                return
+
             values = (
-                name_entry.get(),
-                department_entry.get(),
-                position_entry.get(),
-                salary_entry.get(),
-                bonus_entry.get(),
-                deduction_entry.get(),
-                id_entry.get()
+                name,
+                department,
+                position,
+                salary,
+                bonus,
+                deductions,
+                employee_id
             )
 
             cursor.execute(query, values)
 
             connection.commit()
+
             if refresh_callback:
                 refresh_callback()
+
+            if table_refresh_callback:
+
+                table_refresh_callback()    
             cursor.close()
             connection.close()
 
@@ -548,7 +682,7 @@ def open_update_employee(app,refresh_callback=None):
     )
     update_btn.pack(pady=20)
 
-def open_delete_employee(app,refresh_callback=None):
+def open_delete_employee(app,refresh_callback=None,table_refresh_callback=None):
 
     delete_window = ctk.CTkToplevel(app)
 
@@ -583,6 +717,15 @@ def open_delete_employee(app,refresh_callback=None):
 
         employee_id = id_entry.get()
 
+        if not employee_id:
+
+            messagebox.showwarning(
+                "Missing ID",
+                "Please enter Employee ID"
+            )
+
+            return
+
         confirm = messagebox.askyesno(
             "Confirm Delete",
             "Are you sure you want to delete this employee?"
@@ -602,6 +745,30 @@ def open_delete_employee(app,refresh_callback=None):
             WHERE employee_id=%s
             """
 
+            check_query = """
+            SELECT * FROM employees
+            WHERE employee_id=%s
+            """
+
+            cursor.execute(
+                check_query,
+                (employee_id,)
+            )
+
+            employee_exists = cursor.fetchone()
+
+            if not employee_exists:
+
+                messagebox.showwarning(
+                    "Invalid Employee",
+                    "Employee ID does not exist"
+                )
+
+                cursor.close()
+                connection.close()
+
+                return
+
             cursor.execute(query, (employee_id,))
 
             connection.commit()
@@ -610,6 +777,10 @@ def open_delete_employee(app,refresh_callback=None):
             
             if refresh_callback:
                 refresh_callback()
+
+            if table_refresh_callback:
+
+                table_refresh_callback()
 
             messagebox.showinfo(
                 "Success",
