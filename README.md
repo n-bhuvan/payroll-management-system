@@ -1,107 +1,90 @@
 # Smart Payroll & Workforce Analytics Management System
 
-A modern Payroll Management System built using Python, CustomTkinter, and MySQL with analytics, payroll calculations, PDF payslip generation, and CSV export functionality.
+A modern Payroll Management System built using Python, CustomTkinter, and MySQL with payroll analytics, PDF payslip generation, employee management, and CSV export functionality.
 
 ---
 
-## 🚀 Features
+# 🚀 Features
 
-### 👨‍💼 Employee Management
+## 👨‍💼 Employee Management
+- Add Employee
+- View Employees
+- Update Employee
+- Delete Employee
+- Search Employees
 
-* Add Employee
-* View Employees
-* Update Employee
-* Delete Employee
-* Search Employees
+## 💰 Payroll Management
+- Automatic Net Salary Calculation
+- Bonus & Deduction Handling
+- Payroll Processing
 
-### 💰 Payroll System
+## 📊 Analytics Dashboard
+- Total Employees
+- Total Payroll
+- Average Salary
+- Highest Salary
+- Department-wise Analytics Chart
 
-* Automatic Net Salary Calculation
-* Bonus & Deduction Handling
-* Payroll Analytics
+## 📄 Reports & Export
+- PDF Payslip Generation
+- CSV Report Export
 
-### 📊 Analytics Dashboard
-
-* Total Employees
-* Total Payroll
-* Average Salary
-* Highest Salary
-* Department-wise Analytics Chart
-
-### 📄 Reports & Export
-
-* PDF Payslip Generation
-* CSV Report Export
-
-### ✅ Validation & Error Handling
-
-* Empty Field Validation
-* Numeric Validation
-* Duplicate Prevention
-* Payroll Logic Validation
-* Auto Refresh Dashboard & Tables
+## ✅ Validation & Error Handling
+- Empty Field Validation
+- Numeric Validation
+- Invalid Employee Validation
+- Auto Refresh Dashboard & Tables
+- Responsive Employee Table
 
 ---
 
-## 🛠️ Technologies Used
+# 🛠️ Technologies Used
 
-* Python
-* CustomTkinter
-* MySQL
-* Pandas
-* Matplotlib
-* ReportLab
+- Python
+- CustomTkinter
+- MySQL
+- Pandas
+- Matplotlib
+- ReportLab
 
 ---
 
-## 📁 Project Structure
+# 📁 Project Structure
 
 ```text
 payroll-management-system/
 │
-├── main.py
-├── gui/
-│   ├── login.py
-│   ├── dashboard.py
-│   └── employee.py
-│
-├── database/
-│   └── db.py
-│
-├── models/
-│   ├── payroll.py
-│   ├── payslip.py
-│   └── export.py
-│
 ├── analytics/
-│   └── analytics.py
-│
-├── reports/
-├── payslips/
-└── README.md
+├── database/
+├── gui/
+├── models/
+├── screenshots/
+├── main.py
+├── README.md
+└── requirements.txt
 ```
 
 ---
 
-## ⚙️ Installation & Setup
+# ⚙️ Installation & Setup
 
-### 1️⃣ Clone Repository
+## 1️⃣ Clone Repository
 
 ```bash
 git clone <your-github-repo-link>
 ```
 
-### 2️⃣ Install Dependencies
+## 2️⃣ Install Dependencies
 
 ```bash
-pip install customtkinter pandas matplotlib reportlab mysql-connector-python
+pip install -r requirements.txt
 ```
 
-### 3️⃣ Configure MySQL Database
+## 3️⃣ Configure MySQL Database
 
-Create a MySQL database and employees/admins tables.
+Create a MySQL database and required tables.
 
-### 4️⃣ Run Application
+## 4️⃣ Run Application
 
 ```bash
 python main.py
@@ -109,29 +92,79 @@ python main.py
 
 ---
 
-## 📸 Screenshots
+# 📸 Screenshots
 
-Add screenshots here:
+## 🔐 Login Page
 
-* Login Page
-* Dashboard
-* Employee Management
-* Analytics Chart
-* PDF Payslip
+![Login](screenshots/login.png)
 
 ---
 
-## 🔮 Future Improvements
+## 📊 Dashboard
 
-* User Authentication System
-* Email Payslip Support
-* Multi-user Roles
-* Cloud Database Integration
-* Employee Attendance Tracking
+![Dashboard](screenshots/dashboard.png)
 
 ---
 
-## 👨‍💻 Developed By
+## 👨‍💼 Employee Records
+
+![Employees](screenshots/employees.png)
+
+---
+
+## 🔍 Employee Search
+
+![Search](screenshots/search.png)
+
+---
+
+## ➕ Add Employee
+
+![Add Employee](screenshots/add.png)
+
+---
+
+## ✏️ Update Employee
+
+![Update Employee](screenshots/update.png)
+
+---
+
+## ❌ Delete Employee
+
+![Delete Employee](screenshots/delete.png)
+
+---
+
+## 📈 Analytics Dashboard
+
+![Analytics](screenshots/analytics.png)
+
+---
+
+## 📄 PDF Payslip
+
+![PDF Payslip](screenshots/pdf_payslip.png)
+
+---
+
+## 📁 CSV Export
+
+![CSV Export](screenshots/export_csv.png)
+
+---
+
+# 🔮 Future Improvements
+
+- Multi-user Authentication
+- Cloud Database Integration
+- Employee Attendance Tracking
+- Email Payslip Support
+- Admin/User Roles
+
+---
+
+# 👨‍💻 Developed By
 
 G N Bhuvaneshwaran
 
