@@ -44,11 +44,12 @@ def refresh_dashboard():
 def open_dashboard(app):
     dashboard=ctk.CTkToplevel(app)
 
-    dashboard.geometry("800x500")
+    dashboard.geometry("1200x700")
     dashboard.title("Dashboard")
     dashboard.protocol("WM_DELETE_WINDOW",app.destroy)
-    title=ctk.CTkLabel(dashboard,text="Welcome to the Smart Payroll Management System",font=ctk.CTkFont(size=20,weight="bold"))
-    title.pack(pady=40)
+    title=ctk.CTkLabel(dashboard,text="Welcome to the Smart Payroll Management System",font=("Arial", 34, "bold"))
+    title.pack(pady=25)
+    
 
     total_payroll = get_total_payroll()
 
@@ -58,34 +59,36 @@ def open_dashboard(app):
 
     main_frame = ctk.CTkFrame(
         dashboard,
-        width=1100,
+        width=1150,
         height=550
     )
 
-    main_frame.pack(pady=20)
+    main_frame.pack(pady=20,padx=20)
 
     employee_card = ctk.CTkFrame(
         main_frame,
-        width=200,
-        height=120
+        width=220,
+        height=120,
+        corner_radius=20
     )
 
-    employee_card.place(x=50, y=50)
+    employee_card.place(x=40, y=40)
 
     payroll_card = ctk.CTkFrame(
     main_frame,
     width=220,
-    height=120
+    height=120,
+    corner_radius=20
     )
 
-    payroll_card.place(x=320, y=50)
+    payroll_card.place(x=320, y=40)
 
     global payroll_label
 
     payroll_label = ctk.CTkLabel(
         payroll_card,
         text=f"Total Payroll\n₹{total_payroll}",
-        font=("Arial", 20)
+        font=("Arial", 24, "bold")
     )
 
     payroll_label.place(
@@ -97,17 +100,18 @@ def open_dashboard(app):
     average_card = ctk.CTkFrame(
     main_frame,
     width=220,
-    height=120
+    height=120,
+    corner_radius=20
     )
 
-    average_card.place(x=590, y=50)
+    average_card.place(x=600, y=40)
 
     global average_label
 
     average_label = ctk.CTkLabel(
         average_card,
         text=f"Average Salary\n₹{average_salary}",
-        font=("Arial", 18)
+        font=("Arial",24, "bold")
     )
 
     average_label.place(
@@ -119,17 +123,18 @@ def open_dashboard(app):
     highest_card = ctk.CTkFrame(
     main_frame,
     width=220,
-    height=120
+    height=120,
+    corner_radius=20
     )
 
-    highest_card.place(x=860, y=50)
+    highest_card.place(x=880, y=40)
 
     global highest_label
 
     highest_label = ctk.CTkLabel(
         highest_card,
         text=f"Highest Salary\n₹{highest_salary}",
-        font=("Arial", 18)
+        font=("Arial",24, "bold")
     )
 
     highest_label.place(
@@ -143,7 +148,7 @@ def open_dashboard(app):
     employee_label = ctk.CTkLabel(
         employee_card,
         text="Total Employees\n0",
-        font=("Arial", 20)
+        font=("Arial", 24, "bold")
     )
 
     employee_label.place(relx=0.5, rely=0.5, anchor="center")
@@ -152,30 +157,39 @@ def open_dashboard(app):
         main_frame,
         text="Add Employee",
         width=200,
-        command=lambda: open_add_employee(app,refresh_dashboard)
+        command=lambda: open_add_employee(app,refresh_dashboard),
+        corner_radius=12,
+        height=45,
+        font=("Arial", 16, "bold")
     )
 
     
 
-    add_employee_button.place(x=100, y=250)
+    add_employee_button.place(x=120, y=250)
 
     view_employee_button = ctk.CTkButton(
     main_frame,
     text="View Employees",
     width=200,
-    command=lambda: open_view_employees(app,refresh_dashboard)
+    command=lambda: open_view_employees(app,refresh_dashboard),
+    corner_radius=12,
+    height=45,
+    font=("Arial", 16, "bold")
     )
 
-    view_employee_button.place(x=400, y=250)
+    view_employee_button.place(x=430, y=250)
 
     chart_button = ctk.CTkButton(
     main_frame,
     text="Show Analytics Chart",
     width=220,
-    command=show_department_chart
+    command=show_department_chart,
+    corner_radius=12,
+    height=45,
+    font=("Arial", 16, "bold")
     )
 
-    chart_button.place(x=700, y=250)
+    chart_button.place(x=740, y=250)
 
     refresh_dashboard()
 
