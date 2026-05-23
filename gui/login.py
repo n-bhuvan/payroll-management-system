@@ -18,6 +18,20 @@ def login_page(app):
 
         try:
             connection=connect_db()
+
+            if not username.strip() or not password.strip():
+
+                messagebox.showwarning(
+                    "Missing Login",
+                    "Please enter username and password"
+                )
+
+                username_entry.delete(0, "end")
+
+                password_entry.delete(0, "end")
+
+                return
+
             print("Connected Successfully")
             cursor=connection.cursor()
 

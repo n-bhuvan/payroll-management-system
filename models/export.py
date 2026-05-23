@@ -25,6 +25,11 @@ def export_employee_csv():
     df = pd.read_sql(query, connection)
 
     connection.close()
+    if df.empty:
+
+        raise Exception(
+            "No employee data available to export"
+        )
 
     df["net_salary"] = df.apply(
         lambda row: calculate_net_salary(

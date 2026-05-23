@@ -12,6 +12,12 @@ from models.payslip import generate_payslip
 
 from models.export import export_employee_csv
 
+def clear_entries(entries):
+
+    for entry in entries:
+
+        entry.delete(0, "end")
+
 def save_employee(
     name,
     department,
@@ -186,6 +192,15 @@ def open_add_employee(app,refresh_callback):
                 "Please fill all fields"
             )
 
+            clear_entries([
+                name_entry,
+                department_entry,
+                position_entry,
+                salary_entry,
+                bonus_entry,
+                deduction_entry
+            ])
+
             return
         
         try:
@@ -202,7 +217,12 @@ def open_add_employee(app,refresh_callback):
                 "Invalid Input",
                 "Salary, Bonus and Deductions must be numbers"
             )
-
+            
+            clear_entries([
+                salary_entry,
+                bonus_entry,
+                deduction_entry
+            ])
             return
         
         if (
@@ -215,7 +235,11 @@ def open_add_employee(app,refresh_callback):
                 "Invalid Amount",
                 "Values cannot be negative"
             )
-
+            clear_entries([
+                salary_entry,
+                bonus_entry,
+                deduction_entry
+            ])
             return
         
         if deductions > (salary + bonus):
@@ -224,6 +248,12 @@ def open_add_employee(app,refresh_callback):
                 "Invalid Payroll",
                 "Deductions cannot exceed total earnings"
             )
+
+            clear_entries([
+                salary_entry,
+                bonus_entry,
+                deduction_entry
+            ])   
 
             return
 
@@ -566,6 +596,16 @@ def open_update_employee(app,refresh_callback=None,table_refresh_callback=None):
                 "Please fill all fields"
             )
 
+            clear_entries([
+                id_entry,
+                name_entry,
+                department_entry,
+                position_entry,
+                salary_entry,
+                bonus_entry,
+                deduction_entry
+            ])
+
             return
         
         try:
@@ -583,6 +623,12 @@ def open_update_employee(app,refresh_callback=None,table_refresh_callback=None):
                 "Salary values must be numeric"
             )
 
+            clear_entries([
+                salary_entry,
+                bonus_entry,
+                deduction_entry
+            ])
+
             return
         
         if (
@@ -595,6 +641,12 @@ def open_update_employee(app,refresh_callback=None,table_refresh_callback=None):
                 "Invalid Amount",
                 "Values cannot be negative"
             )
+
+            clear_entries([
+                salary_entry,
+                bonus_entry,
+                deduction_entry
+            ])
 
             return
 
@@ -633,6 +685,8 @@ def open_update_employee(app,refresh_callback=None,table_refresh_callback=None):
                     "Invalid Employee",
                     "Employee ID does not exist"
                 )
+
+                clear_entries([id_entry])
 
                 cursor.close()
                 connection.close()
@@ -723,7 +777,7 @@ def open_delete_employee(app,refresh_callback=None,table_refresh_callback=None):
                 "Missing ID",
                 "Please enter Employee ID"
             )
-
+            clear_entries([id_entry])
             return
 
         confirm = messagebox.askyesno(
@@ -763,7 +817,7 @@ def open_delete_employee(app,refresh_callback=None,table_refresh_callback=None):
                     "Invalid Employee",
                     "Employee ID does not exist"
                 )
-
+                clear_entries([id_entry])
                 cursor.close()
                 connection.close()
 
@@ -841,9 +895,32 @@ def open_payslip_window(app):
 
     id_entry.pack(pady=20)
 
-    def generate_pdf():
-
+    def generate_pdf(): 
+        
         employee_id = id_entry.get()
+
+        if not employee_id:
+
+            messagebox.showwarning(
+                "Missing ID",
+                "Please enter Employee ID"
+            )
+
+            clear_entries([id_entry])
+
+            return
+
+
+        if not employee_id.isdigit():
+
+            messagebox.showwarning(
+                "Invalid Input",
+                "Employee ID must be numeric"
+            )
+
+            clear_entries([id_entry])
+
+            return
 
         try:
 
@@ -885,7 +962,7 @@ def open_payslip_window(app):
                     "Not Found",
                     "Employee ID not found"
                 )
-
+            clear_entries([id_entry])
         except Exception as e:
 
             messagebox.showerror(
@@ -903,6 +980,13 @@ def open_payslip_window(app):
     generate_button.pack(pady=20)
 
 def search_employee(table_frame, search_value):
+
+
+    if not search_value.strip():
+
+        load_employee_table(table_frame)
+
+        return
 
     for widget in table_frame.winfo_children():
 
@@ -1005,6 +1089,7 @@ def search_employee(table_frame, search_value):
             "Database Error",
             str(e)
         )
+        
 
 def export_csv():
 
@@ -1016,6 +1101,8 @@ def export_csv():
             "Export Successful",
             f"CSV Report Saved!\n{file_path}"
         )
+
+        clear_entries([id_entry])
 
     except Exception as e:
 
